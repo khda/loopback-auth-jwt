@@ -1,0 +1,11 @@
+{
+	"ids": {
+		"User": 3
+	},
+	"models": {
+		"User": {
+			"1": "{\"id\":1,\"username\":\"user1\",\"password\":\"user1\",\"isArchived\":false}",
+			"2": "{\"id\":2,\"username\":\"user2\",\"password\":\"user2\",\"isArchived\":false}"
+		}
+	}
+}
