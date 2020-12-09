@@ -12,9 +12,8 @@ import { AuthUser, Jwt, LoginRequest, RevokedTokenData, User } from '../models';
 import {
 	BASIC_AUTENTICATION_NAME,
 	JWT_AUTENTICATION_NAME,
-	JwtService,
-} from '../services';
-import { UserService } from '../services/authe/user.service';
+} from '../modules/authe';
+import { JwtService, UserService } from '../services';
 import {
 	BASIC_OPERATION_SECURITY_SPEC,
 	BEARER_OPERATION_SECURITY_SPEC,

@@ -1,26 +1,30 @@
 import { AuthenticationStrategy } from '@loopback/authentication';
-import { service } from '@loopback/core';
-import { repository } from '@loopback/repository';
+import { inject } from '@loopback/core';
 import { HttpErrors, Request } from '@loopback/rest';
 import { UserProfile, securityId } from '@loopback/security';
 
-import { UserRepository } from '../../repositories';
-
-import { ICredentials } from './types';
-import { UserService } from './user.service';
+import { BasicAuthenticationBindings } from './keys';
+import { IAuthUser, ICredentials, IUser, IUserService } from './types';
 
 export const BASIC_AUTENTICATION_NAME = 'basic';
 
+/**
+ *
+ */
 export class BasicAuthenticationStrategy implements AuthenticationStrategy {
 	public readonly name = BASIC_AUTENTICATION_NAME;
 
+	/**
+	 *
+	 */
 	constructor(
-		@repository(UserRepository)
-		private readonly userRepository: UserRepository,
-		@service(UserService)
-		private readonly userService: UserService,
+		@inject(BasicAuthenticationBindings.USER_SERVICE)
+		private readonly userService: IUserService<IUser, IAuthUser>,
 	) {}
 
+	/**
+	 *
+	 */
 	public async authenticate(request: Request): Promise<UserProfile> {
 		const credentials = this.extractCredentials(request);
 		const user = await this.userService.verifyCredentials(credentials);
@@ -29,6 +33,9 @@ export class BasicAuthenticationStrategy implements AuthenticationStrategy {
 		return Object.assign(authUser, { [securityId]: String(authUser.id) });
 	}
 
+	/**
+	 *
+	 */
 	private extractCredentials(request: Request): ICredentials {
 		if (!request.headers.authorization) {
 			throw new HttpErrors.Unauthorized(

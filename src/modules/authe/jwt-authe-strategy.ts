@@ -1,28 +1,41 @@
 import { AuthenticationStrategy } from '@loopback/authentication';
-import { service } from '@loopback/core';
+import { inject } from '@loopback/core';
 import { HttpErrors, Request } from '@loopback/rest';
 import { UserProfile, securityId } from '@loopback/security';
 
-import { JwtService } from './jwt.service';
+import { JwtAuthenticationBindings } from './keys';
+import { IAuthUser, IJwtService } from './types';
 
 export const JWT_AUTENTICATION_NAME = 'jwt';
 
+/**
+ *
+ */
 export class JwtAuthenticationStrategy implements AuthenticationStrategy {
 	public readonly name = JWT_AUTENTICATION_NAME;
 
+	/**
+	 *
+	 */
 	constructor(
-		@service(JwtService)
-		private readonly jwtService: JwtService,
+		@inject(JwtAuthenticationBindings.JWT_SERVICE)
+		private readonly jwtService: IJwtService<IAuthUser>,
 	) {}
 
-	async authenticate(request: Request): Promise<UserProfile> {
+	/**
+	 *
+	 */
+	public async authenticate(request: Request): Promise<UserProfile> {
 		const accessToken = this.extractAccessToken(request);
 		const authUser = await this.jwtService.verify(accessToken);
 
 		return Object.assign(authUser, { [securityId]: String(authUser.id) });
 	}
 
-	extractAccessToken(request: Request): string {
+	/**
+	 *
+	 */
+	private extractAccessToken(request: Request): string {
 		if (!request.headers.authorization) {
 			throw new HttpErrors.Unauthorized(
 				'Authorization header not found!',

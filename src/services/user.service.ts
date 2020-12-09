@@ -1,19 +1,34 @@
-import { BindingScope, bind } from '@loopback/core';
+import { BindingScope, ContextTags, bind } from '@loopback/core';
 import { repository } from '@loopback/repository';
 import { HttpErrors } from '@loopback/rest';
 
-import { AuthUser, User } from '../../models';
-import { UserRepository } from '../../repositories';
+import { AuthUser, User } from '../models';
+import {
+	BasicAuthenticationBindings,
+	ICredentials,
+	IUserService,
+} from '../modules/authe';
+import { UserRepository } from '../repositories';
 
-import { ICredentials } from './types';
-
-@bind({ scope: BindingScope.SINGLETON, tags: ['service'] })
-export class UserService {
+/**
+ *
+ */
+@bind({
+	scope: BindingScope.SINGLETON,
+	tags: { [ContextTags.KEY]: BasicAuthenticationBindings.USER_SERVICE },
+})
+export class UserService implements IUserService<User, AuthUser> {
+	/**
+	 *
+	 */
 	constructor(
 		@repository(UserRepository)
 		private readonly userRepository: UserRepository,
 	) {}
 
+	/**
+	 *
+	 */
 	public async verifyCredentials(credentials: ICredentials): Promise<User> {
 		const { username, password } = credentials;
 
@@ -28,10 +43,16 @@ export class UserService {
 		return user;
 	}
 
+	/**
+	 *
+	 */
 	public async formAuthUser(user: User): Promise<AuthUser> {
 		return Promise.resolve(new AuthUser(user));
 	}
 
+	/**
+	 *
+	 */
 	public async findById(id: typeof User.prototype.id) {
 		return this.userRepository.findById(id);
 	}

@@ -1,11 +1,9 @@
 import { Entity, model, property } from '@loopback/repository';
 
-// import { IUser } from '../modules/autentication/basic';
-// import { IAuthUser } from '../modules/autentication/jwt';
+import { IUser } from '../modules/authe';
 
 @model()
-// export class User extends Entity implements IUser, IAuthUser {
-export class User extends Entity {
+export class User extends Entity implements IUser {
 	@property({
 		type: 'number',
 		required: false,

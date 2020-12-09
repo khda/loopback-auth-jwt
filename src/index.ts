@@ -2,13 +2,13 @@
 import * as dotenv from 'dotenv';
 
 import {
-	ApplicationConfig,
+	ILoopbackMyJwtAutheApplicationConfig,
 	LoopbackMyJwtAutheApplication,
 } from './application';
 
 export * from './application';
 
-export async function main(options: ApplicationConfig = {}) {
+export async function main(options: ILoopbackMyJwtAutheApplicationConfig = {}) {
 	const app = new LoopbackMyJwtAutheApplication(options);
 	await app.boot();
 	await app.start();
@@ -38,7 +38,7 @@ if (require.main === module) {
 				setServersFromRequest: true,
 			},
 		},
-		authentication: {
+		jwt: {
 			accessTokenSecret: process.env.ACCESS_TOKEN_SECRET ?? 'secret',
 			accessTokenExpiresIn: Number(
 				process.env.ACCESS_TOKEN_EXPIRES_IN ?? 86400,

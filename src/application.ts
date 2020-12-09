@@ -14,20 +14,24 @@ import {
 } from '@loopback/rest-explorer';
 import { ServiceMixin } from '@loopback/service-proxy';
 
-import { MySequence } from './sequence';
 import {
 	BasicAuthenticationStrategy,
 	JwtAuthenticationBindings,
 	JwtAuthenticationStrategy,
-} from './services';
+} from './modules/authe';
+import { MySequence } from './sequence';
+import { IJwtServiceOptions } from './services';
 import { SECURITY_SCHEME_SPEC } from './utils/security-spec';
 
-export { ApplicationConfig };
+export interface ILoopbackMyJwtAutheApplicationConfig
+	extends ApplicationConfig {
+	jwt?: IJwtServiceOptions;
+}
 
 export class LoopbackMyJwtAutheApplication extends BootMixin(
 	ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
-	constructor(options: ApplicationConfig = {}) {
+	constructor(options: ILoopbackMyJwtAutheApplicationConfig = {}) {
 		super(options);
 
 		// Set up the custom sequence
@@ -47,21 +51,7 @@ export class LoopbackMyJwtAutheApplication extends BootMixin(
 		// Basic authentication
 		registerAuthenticationStrategy(this, BasicAuthenticationStrategy);
 		// Jwt authentication
-		this.bind(JwtAuthenticationBindings.ACCESS_TOKEN_SECRET).to(
-			options.authentication.accessTokenSecret,
-		);
-		this.bind(JwtAuthenticationBindings.ACCESS_TOKEN_EXPIRES_IN).to(
-			options.authentication.accessTokenExpiresIn,
-		);
-		this.bind(JwtAuthenticationBindings.ACCESS_TOKEN_ISSUER).to(
-			options.authentication.accessTokenIssuer,
-		);
-		this.bind(JwtAuthenticationBindings.REFRESH_TOKEN_EXPIRES_IN).to(
-			options.authentication.refreshTokenExpiresIn,
-		);
-		this.bind(JwtAuthenticationBindings.REFRESH_TOKEN_SIZE).to(
-			options.authentication.refreshTokenSize,
-		);
+		this.configure(JwtAuthenticationBindings.JWT_SERVICE).to(options.jwt);
 		registerAuthenticationStrategy(this, JwtAuthenticationStrategy);
 
 		this.projectRoot = __dirname;
