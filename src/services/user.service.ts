@@ -17,7 +17,7 @@ import { UserRepository } from '../repositories';
 	scope: BindingScope.SINGLETON,
 	tags: { [ContextTags.KEY]: BasicAuthenticationBindings.USER_SERVICE },
 })
-export class UserService implements IUserService<User, AuthUser> {
+export class UserService implements IUserService<AuthUser> {
 	/**
 	 *
 	 */
@@ -29,7 +29,7 @@ export class UserService implements IUserService<User, AuthUser> {
 	/**
 	 *
 	 */
-	public async verifyCredentials(credentials: ICredentials): Promise<User> {
+	public async verify(credentials: ICredentials): Promise<AuthUser> {
 		const { username, password } = credentials;
 
 		const user = await this.userRepository.findOne({ where: { username } });
@@ -40,7 +40,7 @@ export class UserService implements IUserService<User, AuthUser> {
 			throw new HttpErrors.Unauthorized('Invalid Credentials!');
 		}
 
-		return user;
+		return this.formAuthUser(user);
 	}
 
 	/**
@@ -53,7 +53,7 @@ export class UserService implements IUserService<User, AuthUser> {
 	/**
 	 *
 	 */
-	public async findById(id: typeof User.prototype.id) {
+	public async findById(id: typeof User.prototype.id): Promise<User> {
 		return this.userRepository.findById(id);
 	}
 }

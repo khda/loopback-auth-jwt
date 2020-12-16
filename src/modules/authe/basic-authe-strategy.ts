@@ -4,7 +4,7 @@ import { HttpErrors, Request } from '@loopback/rest';
 import { UserProfile, securityId } from '@loopback/security';
 
 import { BasicAuthenticationBindings } from './keys';
-import { IAuthUser, ICredentials, IUser, IUserService } from './types';
+import { IAuthUser, ICredentials, IUserService } from './types';
 
 export const BASIC_AUTENTICATION_NAME = 'basic';
 
@@ -19,7 +19,7 @@ export class BasicAuthenticationStrategy implements AuthenticationStrategy {
 	 */
 	constructor(
 		@inject(BasicAuthenticationBindings.USER_SERVICE)
-		private readonly userService: IUserService<IUser, IAuthUser>,
+		private readonly userService: IUserService<IAuthUser>,
 	) {}
 
 	/**
@@ -27,8 +27,7 @@ export class BasicAuthenticationStrategy implements AuthenticationStrategy {
 	 */
 	public async authenticate(request: Request): Promise<UserProfile> {
 		const credentials = this.extractCredentials(request);
-		const user = await this.userService.verifyCredentials(credentials);
-		const authUser = await this.userService.formAuthUser(user);
+		const authUser = await this.userService.verify(credentials);
 
 		return Object.assign(authUser, { [securityId]: String(authUser.id) });
 	}

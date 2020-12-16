@@ -1,9 +1,7 @@
 import { Entity, model, property } from '@loopback/repository';
 
-import { IUser } from '../modules/authe';
-
 @model()
-export class User extends Entity implements IUser {
+export class User extends Entity {
 	@property({
 		type: 'number',
 		required: false,

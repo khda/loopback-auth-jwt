@@ -68,8 +68,7 @@ export class AuthController {
 		})
 		loginRequest: LoginRequest,
 	): Promise<Jwt> {
-		const user = await this.userService.verifyCredentials(loginRequest);
-		const authUser = await this.userService.formAuthUser(user);
+		const authUser = await this.userService.verify(loginRequest);
 
 		return this.jwtService.generate(authUser);
 	}

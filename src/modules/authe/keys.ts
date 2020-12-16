@@ -1,11 +1,11 @@
 import { BindingKey } from '@loopback/core';
 
-import { IAuthUser, IJwtService, IUser, IUserService } from './types';
+import { IAuthUser, IJwtService, IUserService } from './types';
 
 export namespace BasicAuthenticationBindings {
-	export const USER_SERVICE = BindingKey.create<
-		IUserService<IUser, IAuthUser>
-	>('services.UserService');
+	export const USER_SERVICE = BindingKey.create<IUserService<IAuthUser>>(
+		'services.UserService',
+	);
 }
 
 export namespace JwtAuthenticationBindings {

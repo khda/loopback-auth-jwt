@@ -10,7 +10,6 @@ import {
 import { inject } from '@loopback/core';
 import {
 	FindRoute,
-	HttpErrors,
 	InvokeMethod,
 	InvokeMiddleware,
 	ParseParams,
@@ -22,32 +21,30 @@ import {
 } from '@loopback/rest';
 import { v4 as uuidV4 } from 'uuid';
 
-import { User } from './models';
-
 const { SequenceActions } = RestBindings;
 
 export class MySequence implements SequenceHandler {
 	constructor(
 		@inject(SequenceActions.FIND_ROUTE)
-		protected findRoute: FindRoute,
+		private readonly findRoute: FindRoute,
 		@inject(SequenceActions.PARSE_PARAMS)
-		protected parseParams: ParseParams,
+		private readonly parseParams: ParseParams,
 		@inject(SequenceActions.INVOKE_METHOD)
-		protected invoke: InvokeMethod,
+		private readonly invoke: InvokeMethod,
 		@inject(SequenceActions.SEND)
-		public send: Send,
+		private readonly send: Send,
 		@inject(SequenceActions.REJECT)
-		public reject: Reject,
+		private readonly reject: Reject,
 
 		@inject(AuthenticationBindings.AUTH_ACTION)
-		protected authenticateRequest: AuthenticateFn,
+		private readonly authenticateRequest: AuthenticateFn,
 
 		/**
 		 * Optional invoker for registered middleware in a chain.
 		 * To be injected via SequenceActions.INVOKE_MIDDLEWARE.
 		 */
 		@inject(SequenceActions.INVOKE_MIDDLEWARE, { optional: true })
-		protected invokeMiddleware: InvokeMiddleware = () => false,
+		private readonly invokeMiddleware: InvokeMiddleware = () => false,
 	) {}
 
 	public async handle(context: RequestContext) {
@@ -65,7 +62,7 @@ export class MySequence implements SequenceHandler {
 			const route = this.findRoute(request);
 			const args = await this.parseParams(request, route);
 
-			const authUser = await this.authenticateRequest(request);
+			await this.authenticateRequest(request);
 
 			const result = await this.invoke(route, args);
 			const endTimestamp = Date.now();
