@@ -27,6 +27,12 @@ export class JwtAuthenticationStrategy implements AuthenticationStrategy {
 	 */
 	public async authenticate(request: Request): Promise<UserProfile> {
 		const accessToken = this.extractAccessToken(request);
+		const isRevoked = await this.jwtService.isRevoked!(accessToken);
+
+		if (isRevoked) {
+			throw new HttpErrors.Unauthorized('Token is revoked!');
+		}
+
 		const authUser = await this.jwtService.verify(accessToken);
 
 		return Object.assign(authUser, { [securityId]: String(authUser.id) });

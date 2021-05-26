@@ -26,7 +26,7 @@ const DEFAULT_ACCESS_TOKEN_ISSUER = 'loopback4';
 const DEFAULT_REFRESH_TOKEN_EXPIRES_IN = 604800;
 const DEFAULT_REFRESH_TOKEN_SIZE = 32;
 
-const MILLISECOND = 1000;
+const SECOND = 1000;
 
 /**
  *
@@ -72,17 +72,16 @@ export class JwtService implements IJwtService<AuthUser> {
 		};
 	}
 
+	public async isRevoked(accessToken: string): Promise<boolean> {
+		const revokedToken = await this.revokedTokenRepository.get(accessToken);
+
+		return Boolean(revokedToken);
+	}
+
 	/**
 	 *
 	 */
-	public async verify(accessToken: string): Promise<AuthUser> {
-		const revokedToken = await this.revokedTokenRepository.get(accessToken);
-
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (revokedToken) {
-			throw new HttpErrors.Unauthorized('Token is revoked!');
-		}
-
+	public verify(accessToken: string): AuthUser {
 		return new AuthUser(
 			jwt.verify(accessToken, this.config.accessTokenSecret) as object,
 		);
@@ -113,7 +112,7 @@ export class JwtService implements IJwtService<AuthUser> {
 			await this.refreshTokenRepository.set(
 				refreshToken,
 				{ userId: authUser.id, accessToken },
-				{ ttl: this.config.refreshTokenExpiresIn * MILLISECOND },
+				{ ttl: this.config.refreshTokenExpiresIn * SECOND },
 			);
 
 			return new Jwt({ accessToken, refreshToken });
@@ -132,7 +131,7 @@ export class JwtService implements IJwtService<AuthUser> {
 		revokedTokenData: RevokedTokenData,
 	): Promise<void> {
 		await this.revokedTokenRepository.set(accessToken, revokedTokenData, {
-			ttl: this.config.accessTokenExpiresIn * MILLISECOND,
+			ttl: this.config.accessTokenExpiresIn * SECOND,
 		});
 	}
 

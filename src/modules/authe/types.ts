@@ -8,9 +8,10 @@ export interface IAuthUser {
 }
 
 export interface IJwtService<AuthUser> {
-	verify: (accessToken: string) => Promise<AuthUser>;
+	isRevoked?: (accessToken: string) => Promise<boolean>;
+	verify: (accessToken: string) => AuthUser | Promise<AuthUser>;
 }
 
 export interface IUserService<AuthUser> {
-	verify: (credentials: ICredentials) => Promise<AuthUser>;
+	verify: (credentials: ICredentials) => AuthUser | Promise<AuthUser>;
 }
